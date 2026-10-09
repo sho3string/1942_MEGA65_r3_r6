@@ -5,6 +5,7 @@
 module jt1942_video(
     input               rst,
     input               clk,
+    input               prog_clk,
     input               cen6,
     input               cen3,
     input               cpu_cen,
@@ -130,7 +131,7 @@ jtframe_tilemap #(.CW(9),.BPP(2),.XOR_HFLIP(1),.XOR_VFLIP(0))u_char(
     .pxl        ( char_prom     )
 );
 
-jtframe_prom #(.AW(8),.DW(4)) u_chprom(
+/*jtframe_prom #(.AW(8),.DW(4)) u_chprom(
     .clk    ( clk            ),
     .cen    ( cen6           ),
     .data   ( prog_din[3:0]  ),
@@ -138,7 +139,19 @@ jtframe_prom #(.AW(8),.DW(4)) u_chprom(
     .wr_addr( prog_addr      ),
     .we     ( prom_char_we   ),
     .q      ( char_pxl       )
+);*/
+
+mega65_prom #(.AW(8),.DW(4)) u_chprom(
+    .clk    ( clk            ),
+    .prog_clk( prog_clk      ),
+    .cen    ( cen6           ),
+    .data   ( prog_din[3:0]  ),
+    .rd_addr( char_prom      ),
+    .wr_addr( prog_addr      ),
+    .we     ( prom_char_we   ),
+    .q      ( char_pxl       )
 );
+
 /* verilator tracing_off */
 `ifndef NOSCR
 wire [2:0] scr_col;
@@ -189,6 +202,8 @@ assign scr_pal_addr[6:4] = scr_br[2:0];
 
 // Scroll palette PROMs
 wire [5:0] scr_pal2;
+
+/*
 jtframe_prom #(.AW(8),.DW(2),.SIMFILE("../../../rom/1942/sb-2.d1")) u_prom_d1(
     .clk    ( clk            ),
     .cen    ( cen6           ),
@@ -219,6 +234,43 @@ jtframe_prom #(.AW(8),.DW(4),.SIMFILE("../../../rom/1942/sb-4.d6")) u_prom_d6(
     .we     ( prom_d6_we     ),
     .q      ( scr_pal_addr[3:0]  )
 );
+*/
+
+mega65_prom #(.AW(8),.DW(2)) u_prom_d1(
+    .clk    ( clk            ),
+    .prog_clk( prog_clk      ),
+    .cen    ( cen6           ),
+    .data   ( prog_din[1:0]  ),
+    .rd_addr( scr_pal_addr   ),
+    .wr_addr( prog_addr      ),
+    .we     ( prom_d1_we     ),
+    .q      ( scr_pal2[5:4]   )
+);
+
+mega65_prom #(.AW(8),.DW(4)) u_prom_d2(
+    .clk    ( clk            ),
+    .prog_clk( prog_clk      ),
+    .cen    ( cen6           ),
+    .data   ( prog_din[3:0]  ),
+    .rd_addr( scr_pal_addr   ),
+    .wr_addr( prog_addr      ),
+    .we     ( prom_d2_we     ),
+    .q      ( scr_pal2[3:0]   )
+);
+
+// Vulgus only uses this PROM
+mega65_prom #(.AW(8),.DW(4)) u_prom_d6(
+    .clk    ( clk            ),
+    .prog_clk( prog_clk      ),
+    .cen    ( cen6           ),
+    .data   ( prog_din[3:0]  ),
+    .rd_addr( {scr_pal, scr_col} ),
+    .wr_addr( prog_addr      ),
+    .we     ( prom_d6_we     ),
+    .q      ( scr_pal_addr[3:0]  )
+);
+
+
 
 reg [3:0] pre_scr_pxl;
 always @(*) begin
@@ -237,6 +289,7 @@ assign scr_pxl   = ~6'h0;
 jt1942_obj #(.PXL_DLY(4)) u_obj(
     .rst            ( rst       ),
     .clk            ( clk       ),
+    .prog_clk       ( prog_clk  ),
     .cen6           ( cen6      ),
     .cen3           ( cen3      ),
     .cpu_cen        ( cpu_cen   ),
@@ -268,6 +321,7 @@ jt1942_obj #(.PXL_DLY(4)) u_obj(
 jt1942_colmix u_colmix (
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .prog_clk   ( prog_clk      ),
     .cen6       ( cen6          ),
     .game_id    ( game_id       ),
     .preLHBL    ( preLHBL       ),

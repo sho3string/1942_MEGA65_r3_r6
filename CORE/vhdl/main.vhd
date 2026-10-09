@@ -16,8 +16,7 @@ use work.globals.all;
 library xpm;
 use xpm.vcomponents.all;
 
-
-
+    
 entity main is
    generic (
       G_VDNUM                 : natural                     -- amount of virtual drives
@@ -99,7 +98,7 @@ signal cm_dipsw_a        : std_logic_vector(7 downto 0);
 signal cm_dipsw_b        : std_logic_vector(7 downto 0);
 signal cm_dipsw          : std_logic_vector(31 downto 0);
 
--- Commando controls
+-- 1942 controls
 signal n42_cab_1p        : std_logic_vector(1 downto 0);
 signal n42_coin          : std_logic_vector(1 downto 0);
 signal service           : std_logic;
@@ -108,7 +107,6 @@ signal joystick2         : std_logic_vector(5 downto 0);
 
 -- DIP switches
 signal n42_dipsw         : std_logic_vector(31 downto 0);
-signal dip_pause         : std_logic;
 signal dip_flip          : std_logic;
 
 -- JTFRAME clock enables
@@ -437,6 +435,7 @@ begin
         -- Clock / Reset
         rst          => reset,
         clk          => clk_main_i,
+        prog_clk     => dn_clk_i,
     
         -- Clock enables
         cen12        => cen12,
@@ -464,7 +463,7 @@ begin
     
         -- DIP switches
         dipsw        => cm_dipsw,
-        dip_pause    => dip_pause,
+        dip_pause    => keyboard_n(m65_capslock),-- '1',     -- pause is active low, active high run
         dip_flip     => dip_flip,
     
         -- Graphics / Debug
@@ -648,6 +647,50 @@ begin
         data_b    => (others => '0'),
         wren_b    => '0',
         q_b       => tmap_dout(15 downto 8)
+    );
+    
+    -- Character ROM - low byte
+    i_rom_char_0 : entity work.dualport_2clk_ram
+    generic map (
+        ADDR_WIDTH => 12,
+        DATA_WIDTH => 8,
+        FALLING_A  => false,
+        FALLING_B  => true
+    )
+    port map (
+        clock_a   => clk_main_i,
+        address_a => char_addr(12 downto 1),
+        data_a    => (others => '0'),
+        wren_a    => '0',
+        q_a       => char_q0,
+
+        clock_b   => dn_clk_i,
+        address_b => dl_char_off(12 downto 1),
+        data_b    => dn_data_i,
+        wren_b    => dn_char_lo_we,
+        q_b       => open
+    );
+
+    -- Character ROM - high byte
+    i_rom_char_1 : entity work.dualport_2clk_ram
+    generic map (
+        ADDR_WIDTH => 12,
+        DATA_WIDTH => 8,
+        FALLING_A  => false,
+        FALLING_B  => true
+    )
+    port map (
+        clock_a   => clk_main_i,
+        address_a => char_addr(12 downto 1),
+        data_a    => (others => '0'),
+        wren_a    => '0',
+        q_a       => char_q1,
+
+        clock_b   => dn_clk_i,
+        address_b => dl_char_off(12 downto 1),
+        data_b    => dn_data_i,
+        wren_b    => dn_char_hi_we,
+        q_b       => open
     );
     
     

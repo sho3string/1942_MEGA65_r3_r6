@@ -266,7 +266,7 @@ constant SEL_CORENAME      : std_logic_vector(15 downto 0) := x"0200";
 
 -- Currently this is only used in the debug console. Use the welcome screen and the
 -- help system to display the name and version of the core to the end user
-constant CORENAME          : string := "Commando v0.5.0";
+constant CORENAME          : string := "1942 v0.5.0";
 
 --------------------------------------------------------------------------------------------------------------------
 -- "Help" menu / Options menu  (Selectors 0x0300 .. 0x0312): DO NOT TOUCH
@@ -329,7 +329,7 @@ constant OPTM_DX           : natural := 23;
 constant OPTM_DY           : natural := 21;
 
 constant OPTM_ITEMS : string :=
-   " Commando\n"            &
+   " 1942\n"                &
    "\n"                     &
    " Flip joystick ports\n" &
    " P1 Fire 2 POTX|POTY\n" &
@@ -368,22 +368,22 @@ constant OPTM_ITEMS : string :=
    " Game Setup\n"          &
    "\n"                     & 
    " DSW A & B\n"           &
-   " SW1-1 Coin A\n"        &
-   " SW1-2 Coin A\n"        &
-   " SW1-3 Coin B\n"        &
-   " SW1-4 Coin B\n"        &
-   " SW1-5 Lives\n"         &
-   " SW1-6 Lives\n"         &
-   " SW1-7 Starting Area\n" &
-   " SW1-8 Starting Area\n" &
-   " SW2-1 Cabinet\n"       &
-   " SW2-2 Cabinet\n"       &
-   " SW2-3 Flip Screen\n"   &
-   " SW2-4 Difficulty\n"    &
-   " SW2-5 Demo Sounds\n"   &
-   " SW2-6 Bonus Life\n"    &
-   " SW2-7 Bonus Life\n"    &
-   " SW2-8 Bonus Life\n"    &
+   " SW1-1 Lives\n"         &
+   " SW1-2 Lives\n"         &
+   " SW1-3 Bonus Lives\n"   &
+   " SW1-4 Bonus Lives\n"   &
+   " SW1-5 Cabinet\n"       &
+   " SW1-6 Coin A\n"        &
+   " SW1-7 Coin A\n"        &
+   " SW1-8 Coin A\n"        &
+   " SW2-1 Screen Stop\n"   &
+   " SW2-2 Difficulty\n"    &
+   " SW2-3 Difficulty\n"    &
+   " SW2-4 Flip Screen\n"   &
+   " SW2-5 Service Mode\n"  &
+   " SW2-6 Coin Be\n"       &
+   " SW2-7 Coin B\n"        &
+   " SW2-8 Coin B\n"        &
    "\n"                     &
    " Back to main menu\n"   &
    "\n"                     &
@@ -487,12 +487,12 @@ type OPTM_GTYPE is array (0 to OPTM_SIZE - 1) of integer range 0 to 2**OPTM_GTC-
                                              OPTM_G_GAP_DSWA1  + OPTM_G_SINGLESEL,                 
                                              OPTM_G_GAP_DSWA2  + OPTM_G_SINGLESEL,            
                                              OPTM_G_GAP_DSWA3  + OPTM_G_SINGLESEL,                    
-                                             OPTM_G_GAP_DSWA4  + OPTM_G_SINGLESEL,                 
+                                             OPTM_G_GAP_DSWA4  + OPTM_G_SINGLESEL + OPTM_G_STDSEL,                 
                                              OPTM_G_GAP_DSWA5  + OPTM_G_SINGLESEL,                
                                              OPTM_G_GAP_DSWA6  + OPTM_G_SINGLESEL,                  
                                              OPTM_G_GAP_DSWA7  + OPTM_G_SINGLESEL,              
-                                             OPTM_G_GAP_DSWB0  + OPTM_G_SINGLESEL + OPTM_G_STDSEL,                  
-                                             OPTM_G_GAP_DSWB1  + OPTM_G_SINGLESEL + OPTM_G_STDSEL,                     
+                                             OPTM_G_GAP_DSWB0  + OPTM_G_SINGLESEL,                  
+                                             OPTM_G_GAP_DSWB1  + OPTM_G_SINGLESEL,                     
                                              OPTM_G_GAP_DSWB2  + OPTM_G_SINGLESEL,                            
                                              OPTM_G_GAP_DSWB3  + OPTM_G_SINGLESEL,                   
                                              OPTM_G_GAP_DSWB4  + OPTM_G_SINGLESEL,

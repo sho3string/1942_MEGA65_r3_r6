@@ -5,6 +5,7 @@
 module jt1942_objdraw(
     input              rst,
     input              clk,     //
+    input              prog_clk,
     input              cen6,    //  6 MHz
     input       [1:0]  game_id,
     // screen
@@ -183,10 +184,23 @@ always @(posedge clk ) begin
     end
 end
 
+/*
 jtframe_prom #(.AW(8),.DW(4),
     .SIMFILE("../../../rom/1942/sb-8.k3")
 ) u_prom_k3(
     .clk    ( clk            ),
+    .cen    ( 1'b1           ),
+    .data   ( prog_din       ),
+    .rd_addr( pal_addr       ),
+    .wr_addr( prog_addr      ),
+    .we     ( prom_pal_we    ),
+    .q      ( prom_dout      )
+);
+*/
+
+mega65_prom #(.AW(8),.DW(4)) u_prom_k3(
+    .clk    ( clk            ),
+    .prog_clk( prog_clk      ),
     .cen    ( 1'b1           ),
     .data   ( prog_din       ),
     .rd_addr( pal_addr       ),

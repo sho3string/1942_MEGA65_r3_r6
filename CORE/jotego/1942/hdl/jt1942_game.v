@@ -7,6 +7,7 @@ module jt1942_game(
     // Clock / Reset
     input             rst,
     input             clk,
+    input             prog_clk,
     input             cen12,
     input             cen6,
     input             cen3,
@@ -154,6 +155,7 @@ end
 /* verilator tracing_off */
 jt1942_main u_main(
     .rst        ( rst           ),
+    .prog_clk   ( prog_clk      ),
     .clk        ( clk           ),
     .cen6       ( cen6          ),
     .cen3       ( cen3          ),
@@ -243,6 +245,7 @@ jt1942_sound u_sound (
 jt1942_video u_video(
     .rst        ( rst           ),
     .clk        ( clk           ),
+    .prog_clk   ( prog_clk      ),
     .cen6       ( cen6          ),
     .cen3       ( cen3          ),
     .game_id    ( game_id       ),

@@ -2,8 +2,8 @@
 """Build six MEGA65 1942 ROM files from MAME 1942.zip.
 
 Uses Jotego's mame2mra.toml sequence, reverse, and bus-width layout.
-Object gfx_sort= hvvvvxx is a separate MiSTer SDRAM address transformation;
-this script does not claim to reproduce that transformation.
+Optionally applies JTFRAME gfx_sort=hvvvvxx to the object ROM.
+The matching FPGA address remap must be present when using sorted data.
 """
 import argparse
 from pathlib import Path
@@ -25,10 +25,21 @@ def interleave(chunks, width):
             result.extend(col)
     return bytes(result)
 
+def sort_object_hvvvvxx(data):
+    """JTFRAME gfx16c, b0=2: remapBits(addr, 2, [4,0,1,2,3])."""
+    result = bytearray(len(data))
+    for src, value in enumerate(data):
+        dst = (src & ~0x7c) | ((src & 0x40) >> 4) | ((src & 0x3c) << 1)
+        result[dst] = value
+    return bytes(result)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('zip', nargs='?', default='1942.zip')
     ap.add_argument('-o', '--out', default='arcade/1942')
+    ap.add_argument('--sort-objects', action='store_true',
+                    help='Apply JTFRAME hvvvvxx sorting to 1942_obj.rom')
     args = ap.parse_args()
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -48,6 +59,7 @@ def main():
                         for n in (14, 15, 16, 17)
                     ]
         obj = interleave([objchips[i] for i in (2,0,3,1)], 16)
+        obj = sort_object_hvvvvxx(obj)
         tiles = [chip(f'sr-{n:02d}.a{n-7}') for n in range(8,14)]
         scr = interleave([tiles[i] for i in (0,2,4,4,1,3,5,5)], 32)
         prom = b''.join(chip(n) if n else bytes(256) for n in PROM_CHIPS)
@@ -59,7 +71,7 @@ def main():
             assert len(data) == size, (name, len(data), size)
             (out / name).write_bytes(data)
             print(f'{name:20} {len(data):7} bytes  CRC32 {zlib.crc32(data):08X}')
-    print('NOTE: gfx_sort= hvvvvxx still needs verification against the object ROM address logic.')
+    print('Object sorting:', 'hvvvvxx' if args.sort_objects else 'none')
 
 if __name__ == '__main__':
     main()

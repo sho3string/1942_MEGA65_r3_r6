@@ -8,6 +8,7 @@
 module jt1942_colmix(
     input           rst,
     input           clk,    // 24 MHz
+    input           prog_clk,
     input           cen6 /* synthesis direct_enable = 1 */,
     input [1:0]     game_id,
     // pixel input from generator modules
@@ -93,6 +94,7 @@ jtframe_blank #(.DLY(BLANK_DLY),.DW(12)) u_dly(
     .rgb_out    ( {red,green,blue}    )
 );
 
+/*
 // palette ROM
 jtframe_prom #(.AW(8),.DW(4),.SIMFILE("rom/1942/sb-5.e8")) u_red(
     .clk    ( clk         ),
@@ -127,6 +129,52 @@ jtframe_prom #(.AW(8),.DW(4),.SIMFILE("rom/1942/sb-7.e10")) u_blue(
 // palette ROM
 jtframe_prom #(.AW(8),.DW(8),.SIMFILE("rom/hige/hgb3.l6")) u_palette(
     .clk    ( clk                 ),
+    .cen    ( cen6                ),
+    .data   ( prom_din            ),
+    .rd_addr( pixel_mux           ),
+    .wr_addr( prog_addr           ),
+    .we     ( prom_pal_we         ),
+    .q      ( hige_pre8           )
+);
+*/
+
+mega65_prom #(.AW(8),.DW(4)) u_red(
+    .clk    ( clk         ),
+    .prog_clk( prog_clk   ),
+    .cen    ( cen6        ),
+    .data   ( prom_dinlo  ),
+    .rd_addr( pixel_mux   ),
+    .wr_addr( prog_addr   ),
+    .we     ( prom_e8_we  ),
+    .q      (vulgus_pre[11:8])
+);
+
+mega65_prom #(.AW(8),.DW(4)) u_green(
+    .clk    ( clk         ),
+    .prog_clk( prog_clk   ),
+    .cen    ( cen6        ),
+    .data   ( prom_dinlo  ),
+    .rd_addr( pixel_mux   ),
+    .wr_addr( prog_addr   ),
+    .we     ( prom_e9_we  ),
+    .q      (vulgus_pre[7:4])
+);
+
+mega65_prom #(.AW(8),.DW(4)) u_blue(
+    .clk    ( clk         ),
+    .prog_clk( prog_clk   ),
+    .cen    ( cen6        ),
+    .data   ( prom_dinlo  ),
+    .rd_addr( pixel_mux   ),
+    .wr_addr( prog_addr   ),
+    .we     ( prom_e10_we ),
+    .q      (vulgus_pre[3:0])
+);
+
+// palette ROM
+mega65_prom #(.AW(8),.DW(8)) u_palette(
+    .clk    ( clk                 ),
+    .prog_clk( prog_clk           ),
     .cen    ( cen6                ),
     .data   ( prom_din            ),
     .rd_addr( pixel_mux           ),

@@ -516,9 +516,9 @@ begin
           VGA_HS         => video_hs,
           VGA_VS         => video_vs,
           VGA_DE         => video_de,
-          rotate_ccw     => not video_flip,
+          rotate_ccw     => '0',
           no_rotate      => '0',
-          flip           => '0',
+          flip           => video_flip,
           FB_VBL         => '0',
           FB_LL          => '0',
           -- output to screen_buffer

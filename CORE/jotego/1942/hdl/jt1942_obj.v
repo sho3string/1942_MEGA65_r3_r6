@@ -8,6 +8,7 @@
 module jt1942_obj(
     input              rst,
     input              clk,
+    input              prog_clk,
     input              cen6,    //  6 MHz
     input              cen3,    //  3 MHz
     input              cpu_cen,
@@ -106,6 +107,7 @@ wire [3:0] new_pxl;
 jt1942_objdraw u_draw(
     .rst            ( rst           ),
     .clk            ( clk           ),
+    .prog_clk       ( prog_clk      ),
     .cen6           ( cen6          ),    //  6 MHz
     .game_id        ( game_id       ),
     // screen
