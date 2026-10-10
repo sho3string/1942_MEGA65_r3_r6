@@ -172,6 +172,7 @@ jtgng_scroll #(
     .SCANW   ( 10      ) // only 9 for 1942
 ) u_scroll (
     .clk          ( clk           ),
+    .prog_clk     ( prog_clk      ),
     .pxl_cen      ( cen6          ),
     // screen position
     .H            ( H             ),

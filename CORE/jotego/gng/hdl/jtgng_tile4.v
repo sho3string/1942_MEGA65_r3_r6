@@ -26,6 +26,7 @@ module jtgng_tile4 #(parameter
                   (PALETTE                 ? 6 : 8))
 ) (
     input              clk,
+    input              prog_clk,
     input              cen6,
     input       [4:0]  HS,
     input       [4:0]  SV,
@@ -263,6 +264,7 @@ generate
         wire [7:0] pal_addr = SCxON ? { scr_pal0, scr_col0 } : 8'hFF;
 
         // Palette
+        /*
         jtframe_prom #(.AW(8),.DW(2),.SIMFILE(SIMFILE_MSB)) u_prom_msb(
             .clk    ( clk            ),
             .cen    ( cen6           ),
@@ -282,6 +284,37 @@ generate
             .we     ( prom_lo_we     ),
             .q      ( scr_pxl[3:0]   )
         );
+        */
+        // Palette PROM - upper 2 bits
+        mega65_prom #(
+            .AW(8),
+            .DW(2)
+        ) u_prom_msb (
+            .clk     (clk),
+            .prog_clk(prog_clk),
+            .cen     (cen6),
+            .data    (prom_din[1:0]),
+            .rd_addr (pal_addr),
+            .wr_addr (prog_addr),
+            .we      (prom_hi_we),
+            .q       (scr_pxl[5:4])
+        );
+        
+        // Palette PROM - lower 4 bits
+        mega65_prom #(
+            .AW(8),
+            .DW(4)
+        ) u_prom_lsb (
+            .clk     (clk),
+            .prog_clk(prog_clk),
+            .cen     (cen6),
+            .data    (prom_din),
+            .rd_addr (pal_addr),
+            .wr_addr (prog_addr),
+            .we      (prom_lo_we),
+            .q       (scr_pxl[3:0])
+        );
+        
     end else begin
         reg [PXLW-1:0] pxl_dly; // to have the same delay as the palette case
         always @(posedge clk)

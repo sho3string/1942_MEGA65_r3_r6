@@ -51,15 +51,15 @@ def main():
         mainrom = b''.join(chip(n) for n in ('srb-03.m3','srb-04.m4','srb-05.m5'))
         mainrom += chip('srb-06.m6') * 2 + chip('srb-07.m7')
         snd = chip('sr-01.c11')
-        # reverse=true: reverse bit order within each byte (Jotego ROM reverse).
-        reverse_bits = bytes(int(f'{i:08b}'[::-1], 2) for i in range(256))
-        char = chip('sr-02.f2').translate(reverse_bits)
+        # Jotego gfx1 reverse=true: swap bytes within each 16-bit word.
+        char = swap_byte_pairs(chip('sr-02.f2'))
         objchips = [
                         chip(f"sr-{n}.{('l' if n in (14, 15) else 'n')}{1 if n % 2 == 0 else 2}")
                         for n in (14, 15, 16, 17)
                     ]
         obj = interleave([objchips[i] for i in (2,0,3,1)], 16)
-        obj = sort_object_hvvvvxx(obj)
+        if args.sort_objects:
+            obj = sort_object_hvvvvxx(obj)
         tiles = [chip(f'sr-{n:02d}.a{n-7}') for n in range(8,14)]
         scr = interleave([tiles[i] for i in (0,2,4,4,1,3,5,5)], 32)
         prom = b''.join(chip(n) if n else bytes(256) for n in PROM_CHIPS)
@@ -72,6 +72,17 @@ def main():
             (out / name).write_bytes(data)
             print(f'{name:20} {len(data):7} bytes  CRC32 {zlib.crc32(data):08X}')
     print('Object sorting:', 'hvvvvxx' if args.sort_objects else 'none')
+    
+def swap_byte_pairs(data):
+    if len(data) % 2:
+        raise ValueError("ROM length must be even")
+
+    result = bytearray(data)
+
+    for i in range(0, len(result), 2):
+        result[i], result[i + 1] = result[i + 1], result[i]
+
+    return bytes(result)
 
 if __name__ == '__main__':
     main()

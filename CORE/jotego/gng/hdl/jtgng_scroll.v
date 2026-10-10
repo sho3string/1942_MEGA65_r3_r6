@@ -18,6 +18,7 @@ module jtgng_scroll #(parameter
     SIMID    = 1    // scr1_lo/hi.bin for simulation files
 ) (
     input              clk,     // 24 MHz
+    input              prog_clk,
     input              pxl_cen  /* synthesis direct_enable = 1 */,    //  6 MHz
     input              Asel,
     input  [SCANW-1:0] AB,
@@ -104,6 +105,7 @@ generate
             .LAYOUT     ( LAYOUT     ))
         u_tile4(
             .clk        (  clk        ),
+            .prog_clk   (prog_clk     ),
             .cen6       (  pxl_cen    ),
             .HS         (  HS[4:0]    ),
             .SV         (  VS[4:0]    ),

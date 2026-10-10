@@ -101,7 +101,6 @@ signal cm_dipsw          : std_logic_vector(31 downto 0);
 -- 1942 controls
 signal n42_cab_1p        : std_logic_vector(1 downto 0);
 signal n42_coin          : std_logic_vector(1 downto 0);
-signal service           : std_logic;
 signal joystick1         : std_logic_vector(5 downto 0);
 signal joystick2         : std_logic_vector(5 downto 0);
 
@@ -428,8 +427,6 @@ begin
        fworst => open
     );
 
-
-    
     i_jt1942_game : entity work.jt1942_game
     port map (
         -- Clock / Reset
@@ -459,7 +456,7 @@ begin
         coin         => n42_coin,
         joystick1    => joystick1,
         joystick2    => joystick2,
-        service      => service,
+        service      => keyboard_n(m65_9),
     
         -- DIP switches
         dipsw        => cm_dipsw,
@@ -499,29 +496,29 @@ begin
         char_data    => char_data,
         char_ok      => char_ok,
 
-    -- Object ROM
-    obj_addr     => obj_addr,
-    obj_data     => obj_data,
-    obj_ok       => obj_ok,
-
-    -- Scroll ROM
-    scr_addr     => scr_addr,
-    scr_data     => scr_data,
-    scr_ok       => scr_ok,
-
-    -- Character RAM
-    chram_addr   => chram_addr,
-    chram_din    => chram_din,
-    chram_o16    => chram_o16,
-    chram_we     => chram_we,
-
-    -- Tilemap RAM
-    tmap_addr    => tmap_addr,
-    tmap_dout    => tmap_dout,
-
-    -- Game selection
-    not_higemaru => open
-    );
+        -- Object ROM
+        obj_addr     => obj_addr,
+        obj_data     => obj_data,
+        obj_ok       => obj_ok,
+    
+        -- Scroll ROM
+        scr_addr     => scr_addr,
+        scr_data     => scr_data,
+        scr_ok       => scr_ok,
+    
+        -- Character RAM
+        chram_addr   => chram_addr,
+        chram_din    => chram_din,
+        chram_o16    => chram_o16,
+        chram_we     => chram_we,
+    
+        -- Tilemap RAM
+        tmap_addr    => tmap_addr,
+        tmap_dout    => tmap_dout,
+    
+        -- Game selection
+        not_higemaru => open
+        );
     
    
    -- Jotego audio path.
@@ -615,12 +612,14 @@ begin
     )
     port map (
         clock_a   => clk_main_i,
+        clen_a    => '1',
         address_a => '0' & chram_addr,
         data_a    => chram_din(7 downto 0),
         wren_a    => chram_we(0),
         q_a       => chram_o16(7 downto 0),
     
         clock_b   => clk_main_i,
+        clen_b    => '1',
         address_b => tmap_addr,
         data_b    => (others => '0'),
         wren_b    => '0',
@@ -637,12 +636,14 @@ begin
     )
     port map (
         clock_a   => clk_main_i,
+        clen_a    => '1',
         address_a => '0' & chram_addr,
         data_a    => chram_din(15 downto 8),
         wren_a    => chram_we(1),
         q_a       => chram_o16(15 downto 8),
     
         clock_b   => clk_main_i,
+        clen_b    => '1',
         address_b => tmap_addr,
         data_b    => (others => '0'),
         wren_b    => '0',
